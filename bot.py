@@ -66,7 +66,7 @@ if not st.session_state.interview_started:
         st.session_state.question = random.choice(interview_questions)
         memory.save_context({"interview_status": "started"}, {"question": st.session_state.question})
         st.session_state.chat_history.append(("Question", st.session_state.question))
-        st.experimental_rerun()
+        st.rerun()
 else:
     st.write(f"**Interview Question:** {st.session_state.question}")
     user_answer = st.text_area("Your Answer:")
@@ -77,7 +77,7 @@ else:
         st.session_state.chat_history.append(("Feedback", feedback))
         st.session_state.question = random.choice(interview_questions)
         memory.save_context({"question": st.session_state.question}, {"answer": user_answer})
-        st.experimental_rerun()
+        st.rerun()
     
     st.write("### Chat History")
     for role, text in st.session_state.chat_history:
