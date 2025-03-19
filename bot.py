@@ -12,8 +12,14 @@ from langchain_groq import ChatGroq
 load_dotenv()
 
 def load_questions():
-    with open("questions.txt", "r") as questions_file:
-        return [line.strip() for line in questions_file.readlines()]
+    with open("questions.txt", "r") as questions:
+        line: list = questions.readlines()    
+    interview_questions = []
+    for every_line in line:
+        nwl = every_line.replace("\n", "")
+        interview_questions.append(nwl)
+    return interview_questions
+    
 
 interview_questions = load_questions()
 
