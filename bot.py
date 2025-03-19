@@ -14,7 +14,6 @@ load_dotenv()
 groq_api_key = st.secrets["GROQ"]
 warnings.filterwarnings("ignore")
 
-# Load interview questions
 with open("questions.txt", "r") as questions:
     interview_questions = [line.strip() for line in questions.readlines()]
 
@@ -24,7 +23,7 @@ chat_bot = ChatGroq(model="gemma2-9b-it", api_key=groq_api_key, temperature=0.5,
 
 def analyze_response(user_response: str):
     chat_history = memory.load_memory_variables({}).get("chat_history", [])
-    last_question = "Unknown question"
+    last_question = " "
     for message in reversed(chat_history):
         if "question" in str(message): 
             last_question = str(message.content)
@@ -79,6 +78,7 @@ else:
     
     user_answer = st.chat_input("Type your response here...")
     if user_answer:
+        
         st.session_state.chat_history.append(("user", user_answer))
         feedback = analyze_response(user_answer)
         st.session_state.chat_history.append(("bot", feedback))
