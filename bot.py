@@ -40,7 +40,7 @@ def ask_question():
     memory.save_context({"interview_status": "started"}, {"question": question})
     return question
 
-def analyze_response(user_response: str):
+
 def analyze_response(user_response: str):
     chat_history = memory.load_memory_variables({}).get("chat_history", [])
 
