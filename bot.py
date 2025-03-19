@@ -41,9 +41,12 @@ def ask_question():
     return question
 
 def analyze_response(user_response: str):
+def analyze_response(user_response: str):
     chat_history = memory.load_memory_variables({}).get("chat_history", [])
-    last_question = st.session_state.current_question
-    
+
+    # Get last question from history
+    last_question = st.session_state.chat_history[-1][0] if st.session_state.chat_history else st.session_state.current_question
+
     template = """
     You are an AI assistant helping with interview preparation.
     Your task is to:
@@ -58,14 +61,18 @@ def analyze_response(user_response: str):
     - Areas for improvement
     - Suggestions for a stronger answer
     """
-    
+
     prompt = ChatPromptTemplate.from_template(template)
     final_prompt = prompt.format(last_question=last_question, user_response=user_response)
     response = chat_bot.invoke(final_prompt).content
-    
+
     memory.save_context({"question": last_question}, {"answer": user_response})
+
+    # Save question-response pair to history
     st.session_state.chat_history.append((last_question, user_response, response))
+
     return response
+
 
 if not st.session_state.interview_started:
     if st.button("Start Interview"):  
