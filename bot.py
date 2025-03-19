@@ -21,19 +21,12 @@ with open("questions.txt", "r") as questions:
 memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 chat_bot = ChatGroq(model="gemma2-9b-it", api_key=groq_api_key, temperature=0.5, max_tokens=500)
 
-def analyze_response(user_response: str):
-    chat_history = memory.load_memory_variables({}).get("chat_history", [])
-    last_question = "Unknown question"
-    for message in reversed(chat_history):
-        if "question" in str(message): 
-            last_question = str(message.content)
-            break
-
+def analyze_response(user_response: str, last_question: str):
     template = """
     You are an AI assistant helping with interview preparation.
     Your task is to:
     1. Analyze the user's response for clarity, relevance, and impact.
-    2. Provide constructive feedback.
+    2. Provide constructive feedback that directly relates to the interview question.
 
     Interview Question: {last_question}
     User Response: {user_response}
@@ -41,7 +34,7 @@ def analyze_response(user_response: str):
     Feedback:
     - Strengths of the response
     - Areas for improvement
-    - Suggestions for a stronger answer
+    - Suggestions for a stronger answer that is relevant to the question
     """
     prompt = ChatPromptTemplate.from_template(template)
     final_prompt = prompt.format(last_question=last_question, user_response=user_response)
@@ -78,9 +71,9 @@ else:
     
     user_answer = st.chat_input("Type your response here...")
     if user_answer:
-        
+        last_question = st.session_state.question
         st.session_state.chat_history.append(("user", user_answer))
-        feedback = analyze_response(user_answer)
+        feedback = analyze_response(user_answer, last_question)
         st.session_state.chat_history.append(("bot", feedback))
         st.session_state.question = random.choice(interview_questions)
         memory.save_context({"question": st.session_state.question}, {"answer": user_answer})
