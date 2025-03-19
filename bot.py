@@ -50,9 +50,8 @@ def analyze_response(user_response: str):
     memory.save_context({"question": last_question}, {"answer": user_response})
     return response
 
-# Streamlit UI
-st.title("Interview Preparation Assistant")
-st.write("Practice answering interview questions and receive AI-generated feedback.")
+st.title("🗣️ Interview Chatbot")
+st.write("Welcome to your AI-powered interview preparation. Answer questions and receive feedback in real time!")
 
 if "interview_started" not in st.session_state:
     st.session_state.interview_started = False
@@ -61,29 +60,34 @@ if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
 if not st.session_state.interview_started:
-    if st.button("Start Interview"): 
+    if st.button("🎤 Start Interview"): 
         st.session_state.interview_started = True
         st.session_state.question = random.choice(interview_questions)
         memory.save_context({"interview_status": "started"}, {"question": st.session_state.question})
-        st.session_state.chat_history.append(("Question", st.session_state.question))
+        st.session_state.chat_history.append(("bot", st.session_state.question))
         st.rerun()
 else:
-    st.write(f"**Interview Question:** {st.session_state.question}")
-    user_answer = st.text_area("Your Answer:")
+    chat_container = st.container()
+    with chat_container:
+        for role, text in st.session_state.chat_history:
+            if role == "bot":
+                st.chat_message("assistant").write(text)
+            elif role == "user":
+                st.chat_message("user").write(text)
+            else:
+                st.write(f"**Feedback:** {text}")
     
-    if st.button("Submit Answer"):
+    user_answer = st.chat_input("Type your response here...")
+    if user_answer:
+        st.session_state.chat_history.append(("user", user_answer))
         feedback = analyze_response(user_answer)
-        st.session_state.chat_history.append(("Answer", user_answer))
-        st.session_state.chat_history.append(("Feedback", feedback))
+        st.session_state.chat_history.append(("bot", feedback))
         st.session_state.question = random.choice(interview_questions)
         memory.save_context({"question": st.session_state.question}, {"answer": user_answer})
+        st.session_state.chat_history.append(("bot", st.session_state.question))
         st.rerun()
     
-    st.write("### Chat History")
-    for role, text in st.session_state.chat_history:
-        st.write(f"**{role}:** {text}")
-    
-    if st.button("End Interview"):
+    if st.button("❌ End Interview"):
         st.session_state.interview_started = False
         st.session_state.chat_history = []
         st.write("Interview session ended. Good luck!")
