@@ -19,7 +19,7 @@ interview_questions = load_questions()
 
 # Initialize memory
 memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-groq_api_key = os.getenv("GROQ_API_KEY")
+groq_api_key = st.secrets["GROQ"]
 warnings.filterwarnings("ignore")
 
 # Initialize ChatGroq
