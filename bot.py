@@ -23,7 +23,7 @@ chat_bot = ChatGroq(model="gemma2-9b-it", api_key=groq_api_key, temperature=0.5,
 
 def analyze_response(user_response: str):
     chat_history = memory.load_memory_variables({}).get("chat_history", [])
-    last_question = " "
+    last_question = "Unknown question"
     for message in reversed(chat_history):
         if "question" in str(message): 
             last_question = str(message.content)
